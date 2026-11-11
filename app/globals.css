@@ -1,0 +1,191 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #1c1915;
+  --muted: #746e66;
+  --ink: #111111;
+  --gold: #c4a574;
+  --champagne: #d7c4a4;
+  --champagne-deep: #cbb892;
+  --ivory: #f4f1ec;
+  --line: #ece7e0;
+  --sale: #9a3b32;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-ink: var(--ink);
+  --color-gold: var(--gold);
+  --color-champagne: var(--champagne);
+  --color-champagne-deep: var(--champagne-deep);
+  --color-ivory: var(--ivory);
+  --color-line: var(--line);
+  --color-sale: var(--sale);
+  --font-sans: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-cormorant), Georgia, "Times New Roman", serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+::selection {
+  background: #e7d7b8;
+  color: #1c1915;
+}
+
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
+
+/* Text fields show focus through their own border instead of a floating ring. */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: none;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes hero-settle {
+  from {
+    transform: scale(1.08);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes quote-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bump {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.45); }
+  100% { transform: scale(1); }
+}
+
+@keyframes pop {
+  0% { opacity: 0; transform: scale(0.6); }
+  60% { opacity: 1; transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
+.animate-bump {
+  display: inline-block;
+  animation: bump 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes toast-down {
+  from { opacity: 0; transform: translateY(-120%) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes toast-timer {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0); }
+}
+
+.animate-toast-down {
+  animation: toast-down 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-pop {
+  animation: pop 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-rise {
+  animation: rise 1.05s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-fade {
+  animation: fade-in 0.9s ease both;
+}
+
+.animate-hero {
+  animation: hero-settle 2.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-quote {
+  animation: quote-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-menu {
+  animation: menu-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+html.motion [data-reveal="wait"] {
+  opacity: 0;
+  transform: translateY(24px);
+}
+
+html.motion [data-reveal="in"] {
+  animation: rise 1s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  html.motion [data-reveal="wait"] {
+    opacity: 1;
+    transform: none;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

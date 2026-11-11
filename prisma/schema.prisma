@@ -1,0 +1,160 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  UNISEX
+}
+
+model User {
+  id            String    @id
+  name          String
+  email         String
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  role          String?
+  banned        Boolean?  @default(false)
+  banReason     String?
+  banExpires    DateTime?
+  sessions      Session[]
+  accounts      Account[]
+
+  createdPerfumes Perfume[] @relation("CreatedPerfumes")
+  updatedPerfumes Perfume[] @relation("UpdatedPerfumes")
+
+  @@unique([email])
+  @@map("user")
+}
+
+model Session {
+  id             String   @id
+  expiresAt      DateTime
+  token          String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  ipAddress      String?
+  userAgent      String?
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  impersonatedBy String?
+
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+model Perfume {
+  id        String   @id
+  name      String
+  gender    Gender[]
+  description String?
+  bestSeller  Boolean? @default(false)
+  price       Int?
+  discount    Int?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  createdById String
+  createdBy   User     @relation("CreatedPerfumes", fields: [createdById], references: [id], onDelete: Cascade)
+
+  updatedById String
+  updatedBy   User     @relation("UpdatedPerfumes", fields: [updatedById], references: [id], onDelete: Cascade)
+
+  images PerfumeImage[]
+  reviews PerfumeReview[]
+
+  @@index([createdById])
+  @@map("perfume")
+}
+
+model PerfumeImage {
+  id        String   @id
+  
+  perfumeId String
+  perfume   Perfume  @relation(fields: [perfumeId], references: [id], onDelete: Cascade)
+
+  fileKey   String
+  fileSize  Float
+  fileType  String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([perfumeId])
+  @@map("perfume_image")
+}
+
+model PerfumeReview {
+  id        String   @id
+  perfumeId String
+  perfume   Perfume  @relation(fields: [perfumeId], references: [id], onDelete: Cascade)
+
+  review String
+  rating Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([perfumeId])
+  @@map("perfume_review")
+}
+/// Customer quotes shown on the storefront's testimonials carousel.
+model Testimonial {
+  id        String   @id
+  name      String
+  /// City or country shown after the name, e.g. "Jakarta".
+  place     String?
+  /// Indonesian quote (shown on /id).
+  quoteId   String
+  /// English quote (shown on /en). Falls back to the Indonesian quote when empty.
+  quoteEn   String?
+  published Boolean  @default(true)
+  /// Lower numbers show first.
+  position  Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([published, position])
+  @@map("testimonial")
+}
