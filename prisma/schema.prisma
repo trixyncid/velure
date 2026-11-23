@@ -92,6 +92,15 @@ model Perfume {
   bestSeller  Boolean? @default(false)
   price       Int?
   discount    Int?
+
+  /// Scent profile: how the perfume smells. Never what it is made from.
+  /// The scents this perfume has (see Scent); the scent finder matches on them.
+  scents        Scent[]       @relation("PerfumeScents")
+  /// "Karakter Aroma", e.g. "Warm Spicy, Woody & Leathery".
+  character     String?
+  topNotes      String[]      @default([])
+  middleNotes   String[]      @default([])
+  baseNotes     String[]      @default([])
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -157,4 +166,22 @@ model Testimonial {
 
   @@index([published, position])
   @@map("testimonial")
+}
+
+/// A scent visitors can pick in the storefront's scent finder ("Aroma apa yang Anda suka?"),
+/// e.g. "Vanilla" or "Kopi". Managed in the admin; each perfume is ticked with the scents it has.
+model Scent {
+  id        String    @id
+  /// Indonesian name (shown on /id).
+  nameId    String
+  /// English name (shown on /en). Falls back to the Indonesian when empty.
+  nameEn    String?
+  /// Lower numbers are listed first.
+  position  Int       @default(0)
+  perfumes  Perfume[] @relation("PerfumeScents")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([position])
+  @@map("scent")
 }

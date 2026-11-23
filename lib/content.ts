@@ -40,6 +40,13 @@ export type Product = {
   images: string[];
   rating: number | null;
   reviews: number;
+  /** Scent profile entered in the admin. Empty values mean "not entered yet". */
+  scent: {
+    /** The scents it has, in the admin's order, with their names in both languages. */
+    scents: { id: string; nameId: string; nameEn: string }[];
+    character: string;
+    notes: { top: string[]; middle: string[]; base: string[] };
+  };
 };
 
 export const genderCategory = {

@@ -25,6 +25,11 @@ function toFragrance(perfume: {
   price: number | null;
   discount: number | null;
   bestSeller: boolean | null;
+  scents?: { id: string }[];
+  character: string | null;
+  topNotes: string[];
+  middleNotes: string[];
+  baseNotes: string[];
   updatedAt: Date;
   images: { fileKey: string; fileType: string; fileSize: number; createdAt: Date }[];
 }): Fragrance {
@@ -45,6 +50,11 @@ function toFragrance(perfume: {
     price: perfume.price,
     discount: perfume.discount,
     bestSeller: perfume.bestSeller ?? false,
+    scentIds: (perfume.scents ?? []).map((scent) => scent.id),
+    character: perfume.character ?? "",
+    topNotes: perfume.topNotes,
+    middleNotes: perfume.middleNotes,
+    baseNotes: perfume.baseNotes,
     updatedAt: perfume.updatedAt.toISOString(),
     images,
   };
@@ -52,6 +62,7 @@ function toFragrance(perfume: {
 
 const perfumeInclude = {
   images: { orderBy: { createdAt: "asc" as const } },
+  scents: { select: { id: true } },
 };
 
 export async function listFragrances() {

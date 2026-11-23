@@ -6,6 +6,24 @@ export const genders = [
 
 export type GenderValue = (typeof genders)[number]["value"];
 
+export const MAX_CHARACTER_LENGTH = 160;
+export const MAX_NOTES_PER_TIER = 12;
+export const MAX_NOTE_LENGTH = 40;
+
+/** "Bergamot, Grapefruit" → ["Bergamot", "Grapefruit"]: trimmed, de-duplicated, order kept. */
+export function parseNotesInput(value: string) {
+  const seen = new Set<string>();
+  const notes: string[] = [];
+  for (const part of value.split(/[,;\n]/)) {
+    const note = part.replace(/\s+/g, " ").trim();
+    const key = note.toLowerCase();
+    if (!note || seen.has(key)) continue;
+    seen.add(key);
+    notes.push(note);
+  }
+  return notes;
+}
+
 export const MAX_PHOTOGRAPHS = 8;
 export const MAX_NAME_LENGTH = 120;
 export const MAX_DESCRIPTION_LENGTH = 4000;
@@ -30,6 +48,13 @@ export type Fragrance = {
   /** Percent off the price, 0–90. */
   discount: number | null;
   bestSeller: boolean;
+  /** Scent profile: how it smells, for the shop's detail view and scent finder. */
+  /** The scents it has (Scent ids), for the shop's scent finder. */
+  scentIds: string[];
+  character: string;
+  topNotes: string[];
+  middleNotes: string[];
+  baseNotes: string[];
   updatedAt: string;
   images: Photograph[];
 };

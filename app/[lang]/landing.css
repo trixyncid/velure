@@ -1,0 +1,384 @@
+/* Night theme for the storefront. Scoped to html.night, so the admin is untouched. */
+
+html.night {
+  --background: #04060c;
+  --foreground: #ece7dc;
+  --muted: #a8a397;
+  --ink: #070a14;
+  --line: rgba(236, 231, 220, 0.14);
+  color-scheme: dark;
+  /* Lenis drives smooth scrolling; native smooth scrolling would fight it. */
+  scroll-behavior: auto;
+}
+
+html.night body {
+  background: #04060c;
+  color: var(--foreground);
+}
+
+html.night ::selection {
+  background: #d7c4a4;
+  color: #070a14;
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* Shown before the canvas loads, and instead of it without WebGL or with reduced motion. */
+.night-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 20% 14%, rgba(233, 239, 255, 0.5) 0, rgba(157, 180, 255, 0.16) 3%, transparent 16%),
+    radial-gradient(ellipse 90% 45% at 50% 108%, rgba(52, 66, 130, 0.42), transparent 70%),
+    radial-gradient(ellipse 70% 50% at 80% 40%, var(--night-tint, rgba(40, 50, 100, 0.22)), transparent 70%),
+    linear-gradient(#04060c, #070b18 60%, #04060c);
+}
+
+.night-backdrop::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.7;
+  background-image:
+    radial-gradient(1px 1px at 12% 22%, #fff, transparent),
+    radial-gradient(1px 1px at 34% 8%, #dfe6ff, transparent),
+    radial-gradient(1.5px 1.5px at 58% 18%, #fff, transparent),
+    radial-gradient(1px 1px at 76% 30%, #dfe6ff, transparent),
+    radial-gradient(1px 1px at 88% 12%, #fff, transparent),
+    radial-gradient(1px 1px at 46% 36%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 8% 48%, #dfe6ff, transparent),
+    radial-gradient(1px 1px at 66% 52%, #fff, transparent),
+    radial-gradient(1px 1px at 92% 58%, #fff, transparent),
+    radial-gradient(1px 1px at 24% 64%, #dfe6ff, transparent);
+  background-size: 620px 620px;
+}
+
+/* Masked line reveal for headlines. */
+.line-mask {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.14em;
+  margin-bottom: -0.14em;
+}
+
+.line-mask > span {
+  display: block;
+  transform: translateY(112%);
+  transition: transform 1.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.line-mask[data-shown="true"] > span {
+  transform: none;
+}
+
+.fade-up {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 1.1s ease,
+    transform 1.1s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.fade-up[data-shown="true"] {
+  opacity: 1;
+  transform: none;
+}
+
+/* In the components layer so Tailwind utilities (md:bg-transparent, w-full…) can override them. */
+@layer components {
+.link-quiet {
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(236, 231, 220, 0.82);
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid rgba(215, 196, 164, 0.5);
+  transition:
+    color 0.3s,
+    border-color 0.3s;
+}
+
+.link-quiet:hover {
+  color: var(--champagne);
+  border-color: var(--champagne);
+}
+
+.eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.panel-glass {
+  background: rgba(7, 10, 20, 0.66);
+  border: 1px solid rgba(236, 231, 220, 0.1);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+}
+
+.btn-gold,
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  min-height: 48px;
+  padding: 0 1.6rem;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition:
+    background-color 0.3s,
+    border-color 0.3s,
+    color 0.3s,
+    transform 0.2s;
+}
+
+.btn-gold {
+  background: var(--champagne);
+  color: #070a14;
+}
+
+.btn-gold:hover {
+  background: #e6d6ba;
+}
+
+.btn-ghost {
+  border: 1px solid rgba(215, 196, 164, 0.45);
+  color: var(--foreground);
+}
+
+.btn-ghost:hover {
+  border-color: var(--champagne);
+  color: var(--champagne);
+}
+
+.btn-gold:active,
+.btn-ghost:active {
+  transform: scale(0.97);
+}
+
+.btn-gold:disabled,
+.btn-ghost:disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+}
+
+/*
+ * Hero: a tall section with a pinned stage. Scroll plays the opening shot behind it
+ * (components/landing/three/HeroFilm.tsx) while the beats of copy come and go
+ * (components/landing/HeroScrub.tsx).
+ */
+.hero-film {
+  position: relative;
+  height: 520svh;
+}
+
+.hero-pin {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+}
+
+.hero-beat {
+  position: absolute;
+  inset-inline: 0;
+  padding-inline: 1.25rem;
+  text-align: center;
+  text-shadow: 0 2px 28px rgba(4, 6, 12, 0.75);
+  will-change: opacity, transform;
+}
+
+.hero-beat[data-beat="title"] {
+  top: 46%;
+}
+
+.hero-beat[data-beat="tagline"] {
+  top: 27%;
+  opacity: 0;
+}
+
+/* Beside the bottle on wide screens, beneath it on narrow ones. */
+.hero-beat[data-beat="reveal"] {
+  bottom: 5svh;
+  opacity: 0;
+}
+
+.hero-beat[data-beat="reveal"] .btn-gold {
+  text-shadow: none;
+}
+
+/* On narrow screens the copy sits under the bottle, on a soft dark footing. */
+.hero-beat[data-beat="reveal"]::before {
+  content: "";
+  position: absolute;
+  inset: -4.5rem 0 -5svh;
+  z-index: -1;
+  background: linear-gradient(to top, #04060c 62%, rgba(4, 6, 12, 0));
+}
+
+@media (min-width: 768px) {
+  .hero-beat[data-beat="reveal"] {
+    top: 36%;
+    bottom: auto;
+    left: max(2.5rem, calc(50% - 620px));
+    right: auto;
+    width: min(21rem, 26vw);
+    padding-inline: 0;
+    text-align: left;
+  }
+
+  .hero-beat[data-beat="reveal"]::before {
+    display: none;
+  }
+}
+
+/* The story scrolls over the bottle shot: a soft dark pool behind each block of copy. */
+.story-pool {
+  position: relative;
+  text-shadow: 0 2px 24px rgba(4, 6, 12, 0.8);
+}
+
+.story-pool::before {
+  content: "";
+  position: absolute;
+  /* Stays inside the page gutter: anything wider would make a phone scroll sideways. */
+  inset: -34% -1.25rem;
+  z-index: -1;
+  background: radial-gradient(ellipse at center, rgba(4, 6, 12, 0.86), rgba(4, 6, 12, 0.6) 50%, rgba(4, 6, 12, 0) 76%);
+  pointer-events: none;
+}
+
+@media (min-width: 768px) {
+  /* Copy on one side: darken from that edge of the screen and fade out toward the bottle. */
+  .story-pool::before {
+    inset: -50% -45% -50% -100vw;
+    background: linear-gradient(to left, rgba(4, 6, 12, 0), rgba(4, 6, 12, 0.72) 30%, rgba(4, 6, 12, 0.9) 48%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 30%, #000 70%, transparent);
+    mask-image: linear-gradient(to bottom, transparent, #000 30%, #000 70%, transparent);
+  }
+
+  /* Runs off the right edge of the screen; the story section clips the overflow. */
+  .story-pool-right::before {
+    inset: -50% -100vw -50% -45%;
+    background: linear-gradient(to right, rgba(4, 6, 12, 0), rgba(4, 6, 12, 0.72) 32%, rgba(4, 6, 12, 0.9) 60%);
+  }
+}
+
+/* Dark gradients that keep copy readable over footage. */
+.scrim-left,
+.scrim-bottom {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transition: opacity 0.9s ease;
+}
+
+.scrim-left {
+  background: linear-gradient(to right, rgba(4, 6, 12, 0.88), rgba(4, 6, 12, 0.6) 26%, transparent 52%);
+  /* No visible top edge while the chapter is still scrolling into place. */
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 22%);
+  mask-image: linear-gradient(to bottom, transparent, #000 22%);
+}
+
+.scrim-bottom {
+  background: linear-gradient(to top, rgba(4, 6, 12, 0.92), rgba(4, 6, 12, 0.55) 22%, transparent 46%);
+}
+
+.hero-cue {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* No WebGL or reduced motion: one still screen with all the copy. */
+[data-mode="static"] .hero-film {
+  height: auto;
+}
+
+[data-mode="static"] .hero-pin {
+  position: relative;
+  display: flex;
+  min-height: 100svh;
+  height: auto;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1.75rem;
+  padding-block: 7rem 5rem;
+  background:
+    linear-gradient(rgba(4, 6, 12, 0.15), rgba(4, 6, 12, 0.1) 55%, #04060c),
+    url("/landing/film/moon/sd/044.webp") 45.7% 50% / cover no-repeat;
+}
+
+[data-mode="static"] .hero-beat {
+  position: static;
+  opacity: 1;
+}
+
+[data-mode="static"] .hero-cue {
+  display: none;
+}
+
+@keyframes scroll-cue {
+  0% { transform: scaleY(0); transform-origin: top; }
+  45% { transform: scaleY(1); transform-origin: top; }
+  55% { transform: scaleY(1); transform-origin: bottom; }
+  100% { transform: scaleY(0); transform-origin: bottom; }
+}
+
+.scroll-cue {
+  animation: scroll-cue 2.4s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
+@keyframes gold-burst {
+  0% { opacity: 0; transform: scale(0.4); }
+  30% { opacity: 1; }
+  100% { opacity: 0; transform: scale(2.2); }
+}
+
+.gold-burst {
+  animation: gold-burst 1.6s ease-out both;
+}
+
+/* Still scenes for the craft chapter (no WebGL / reduced motion). */
+.craft-orb {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(2px);
+  transition:
+    transform 1.2s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 1.2s ease,
+    box-shadow 1.2s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .line-mask > span,
+  .fade-up {
+    transform: none;
+    opacity: 1;
+    transition: none;
+  }
+
+  .scroll-cue {
+    animation: none;
+  }
+}

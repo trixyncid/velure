@@ -8,7 +8,11 @@ import {
   MAX_NAME_LENGTH,
   MAX_PRICE,
   MAX_PHOTOGRAPHS,
+  MAX_CHARACTER_LENGTH,
+  MAX_NOTES_PER_TIER,
+  MAX_NOTE_LENGTH,
   isGenderValue,
+  parseNotesInput,
 } from "@/lib/catalog";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/session";
@@ -66,6 +70,13 @@ function readImages(images: ImageInput[]): { images: ImageInput[] } | { error: s
   return { images };
 }
 
+/** Cleans one tier of notes; returns null when it breaks a limit. */
+function readNotes(notes: string[] | undefined) {
+  const clean = parseNotesInput((notes ?? []).join(","));
+  if (clean.length > MAX_NOTES_PER_TIER || clean.some((note) => note.length > MAX_NOTE_LENGTH)) return null;
+  return clean;
+}
+
 export async function saveFragrance(input: {
   id?: string;
   name: string;
@@ -74,6 +85,11 @@ export async function saveFragrance(input: {
   price: number | null;
   discount: number | null;
   bestSeller: boolean;
+  scentIds?: string[];
+  character?: string;
+  topNotes?: string[];
+  middleNotes?: string[];
+  baseNotes?: string[];
   images: ImageInput[];
 }): Promise<SaveResult> {
   const session = await requireAdmin();
@@ -103,6 +119,29 @@ export async function saveFragrance(input: {
     return { ok: false, error: "Add a price before setting a discount." };
   }
   const bestSeller = input.bestSeller === true;
+
+  // Keep only scents that still exist (one may have been deleted meanwhile).
+  const wantedScents = [...new Set(input.scentIds ?? [])].filter((id) => typeof id === "string" && id.length <= 64);
+  const scentIds = wantedScents.length
+    ? (await prisma.scent.findMany({ where: { id: { in: wantedScents } }, select: { id: true } })).map(
+        (scent) => scent.id,
+      )
+    : [];
+  const character = (input.character ?? "").replace(/\s+/g, " ").trim();
+  if (character.length > MAX_CHARACTER_LENGTH) {
+    return { ok: false, error: "Shorten the scent character." };
+  }
+  const topNotes = readNotes(input.topNotes);
+  const middleNotes = readNotes(input.middleNotes);
+  const baseNotes = readNotes(input.baseNotes);
+  if (!topNotes || !middleNotes || !baseNotes) {
+    return {
+      ok: false,
+      error: `Use up to ${MAX_NOTES_PER_TIER} notes per layer, each ${MAX_NOTE_LENGTH} characters or fewer.`,
+    };
+  }
+  const scent = { character: character || null, topNotes, middleNotes, baseNotes };
+  const scents = scentIds.map((scentId) => ({ id: scentId }));
 
   const photographs = readImages(input.images);
   if ("error" in photographs) return { ok: false, error: photographs.error };
@@ -136,6 +175,8 @@ export async function saveFragrance(input: {
           price,
           discount,
           bestSeller,
+          ...scent,
+          scents: { set: scents },
           updatedById: session.user.id,
         },
       });
@@ -150,6 +191,8 @@ export async function saveFragrance(input: {
           price,
           discount,
           bestSeller,
+          ...scent,
+          scents: { connect: scents },
           createdById: session.user.id,
           updatedById: session.user.id,
         },

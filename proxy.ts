@@ -9,7 +9,10 @@ export function proxy(request: NextRequest) {
   if (pathname === "/") {
     const saved = request.cookies.get(LOCALE_COOKIE)?.value ?? "";
     const locale = hasLocale(saved) ? saved : defaultLocale;
-    return NextResponse.redirect(new URL(`/${locale}`, request.url));
+    // Keep the query string, so ad links like /?product=midnight-sin survive the redirect.
+    const target = new URL(`/${locale}`, request.url);
+    target.search = request.nextUrl.search;
+    return NextResponse.redirect(target);
   }
 
   if (pathname === "/admin/login") return NextResponse.next();

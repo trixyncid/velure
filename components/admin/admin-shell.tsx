@@ -12,11 +12,13 @@ import {
   IconOverview,
   IconPeople,
   IconQuote,
+  IconStar,
 } from "@/components/icons";
 
 const nav = [
   { href: "/admin", label: "Overview", icon: IconOverview },
   { href: "/admin/perfumes", label: "Fragrances", icon: IconFragrance },
+  { href: "/admin/scent", label: "Scents", icon: IconStar },
   { href: "/admin/testimonials", label: "Testimonials", icon: IconQuote },
   { href: "/admin/users", label: "People", icon: IconPeople },
 ] as const;

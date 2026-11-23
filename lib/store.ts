@@ -23,6 +23,7 @@ export async function getStoreCatalog(): Promise<Product[]> {
       include: {
         images: { orderBy: { createdAt: "asc" } },
         reviews: { select: { rating: true } },
+        scents: { orderBy: [{ position: "asc" }, { createdAt: "asc" }], select: { id: true, nameId: true, nameEn: true } },
       },
     });
 
@@ -47,6 +48,11 @@ export async function getStoreCatalog(): Promise<Product[]> {
           ? Math.round((ratings.reduce((sum, value) => sum + value, 0) / ratings.length) * 10) / 10
           : null,
         reviews: ratings.length,
+        scent: {
+          scents: perfume.scents.map((scent) => ({ id: scent.id, nameId: scent.nameId, nameEn: scent.nameEn ?? "" })),
+          character: perfume.character ?? "",
+          notes: { top: perfume.topNotes, middle: perfume.middleNotes, base: perfume.baseNotes },
+        },
       };
     });
   } catch (error) {

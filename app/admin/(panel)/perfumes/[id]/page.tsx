@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { FragranceEditor } from "@/components/admin/fragrance-editor";
 import { getFragrance } from "@/lib/perfumes";
+import { listScents } from "@/lib/scent";
 import { spacesStatus } from "@/lib/spaces";
 
 type PageProps = {
@@ -16,8 +17,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function FragrancePage({ params }: PageProps) {
   const { id } = await params;
-  const fragrance = await getFragrance(id);
+  const [fragrance, scents] = await Promise.all([getFragrance(id), listScents().catch(() => [])]);
   if (!fragrance) notFound();
 
-  return <FragranceEditor fragrance={fragrance} storageReady={spacesStatus().configured} />;
+  return <FragranceEditor fragrance={fragrance} storageReady={spacesStatus().configured} scents={scents} />;
 }
